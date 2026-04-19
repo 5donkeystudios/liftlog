@@ -157,6 +157,8 @@ function handleTokenResponse(resp) {
   S.accessToken = resp.access_token;
   S.tokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
   localStorage.setItem('liftlog_signed_in', '1');
+  localStorage.setItem('liftlog_token', resp.access_token);
+  localStorage.setItem('liftlog_token_expiry', S.tokenExpiry);
   onAuthenticated();
 }
 
@@ -174,6 +176,8 @@ function silentRefresh() {
       if (resp.error) { reject(new Error(resp.error)); return; }
       S.accessToken = resp.access_token;
       S.tokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
+      localStorage.setItem('liftlog_token', S.accessToken);
+      localStorage.setItem('liftlog_token_expiry', S.tokenExpiry);
       resolve();
     };
     tokenClient.requestAccessToken({ prompt: '' });
@@ -202,6 +206,8 @@ function signOut() {
   S.activeSession = null;
   clearInterval(S.timerInterval);
   localStorage.removeItem('liftlog_signed_in');
+  localStorage.removeItem('liftlog_token');
+  localStorage.removeItem('liftlog_token_expiry');
   showScreen('auth');
   closeUserMenu();
 }
@@ -1015,6 +1021,17 @@ async function init() {
   S.clientId = storedId;
   await initTokenClient();
 
+  // Try restoring a cached token first (works across cold launches on iOS PWA)
+  const cachedToken = localStorage.getItem('liftlog_token');
+  const cachedExpiry = +localStorage.getItem('liftlog_token_expiry');
+  if (cachedToken && cachedExpiry && Date.now() < cachedExpiry) {
+    S.accessToken = cachedToken;
+    S.tokenExpiry = cachedExpiry;
+    onAuthenticated();
+    return;
+  }
+
+  // Token expired — try silent refresh via GIS
   const wasSignedIn = localStorage.getItem('liftlog_signed_in');
   if (wasSignedIn) {
     showScreen('auth');
@@ -1022,7 +1039,8 @@ async function init() {
     $('sign-in-btn').disabled = true;
     const ok = await tryAutoSignIn();
     if (ok) {
-      localStorage.setItem('liftlog_signed_in', '1');
+      localStorage.setItem('liftlog_token', S.accessToken);
+      localStorage.setItem('liftlog_token_expiry', S.tokenExpiry);
       onAuthenticated();
       return;
     }
