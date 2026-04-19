@@ -519,6 +519,11 @@ select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 .hidden { display: none !important; }
 .mt-8 { margin-top: 8px; }
 
+/* ── Backup section ───────────────────────────────────────── */
+.backup-section { padding: 0 16px 32px; }
+.backup-row { display: flex; gap: 10px; margin-top: 8px; }
+.backup-row .btn { flex: 1; }
+
 /* ── Scrollbar ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }

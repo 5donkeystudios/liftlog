@@ -15,47 +15,10 @@
 <body>
 <div id="app">
 
-  <!-- Setup screen -->
-  <div id="screen-setup" class="screen hidden">
-    <div class="center-content">
-      <div class="app-logo">🏋️</div>
-      <h1>LiftLog</h1>
-      <p class="subtitle">Track your gains. Own your data.</p>
-      <div class="card setup-card">
-        <h2>Connect Google Drive</h2>
-        <p>Enter your Google OAuth Client ID. Your workout data will be stored in your own Drive.</p>
-        <label for="client-id-input">OAuth Client ID</label>
-        <input type="text" id="client-id-input" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
-        <button id="save-setup-btn" class="btn btn-primary btn-block">Save &amp; Continue</button>
-        <p class="setup-help-text">See <strong>README.md</strong> for step-by-step setup instructions.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Auth screen -->
-  <div id="screen-auth" class="screen hidden">
-    <div class="center-content">
-      <div class="app-logo">🏋️</div>
-      <h1>LiftLog</h1>
-      <p class="subtitle">Track your gains. Own your data.</p>
-      <button id="sign-in-btn" class="btn btn-primary btn-lg">Sign in with Google</button>
-      <p class="auth-note">Your data lives in your own Google Drive.</p>
-      <button id="change-client-id-btn" class="btn btn-ghost btn-sm">Change Client ID</button>
-    </div>
-  </div>
-
-  <!-- Main app -->
-  <div id="screen-main" class="screen hidden">
+  <div id="screen-main" class="screen">
     <header class="app-header">
       <span class="app-header-title">LiftLog</span>
-      <div class="header-right">
-        <span id="sync-indicator" class="sync-indicator" title=""></span>
-        <button id="user-menu-btn" class="btn-icon" aria-label="Account">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-        </button>
-      </div>
+      <span id="sync-indicator" class="sync-indicator"></span>
     </header>
 
     <main id="view-container" class="view-container">
@@ -105,10 +68,18 @@
       <!-- PLAN -->
       <section id="view-plan" class="view hidden">
         <div class="view-header">
-          <h2>Workout Plan</h2>
+          <h2>Plan</h2>
           <button id="add-day-btn" class="btn btn-outline btn-sm">+ Day</button>
         </div>
         <div id="plan-days" class="plan-days"></div>
+        <div class="backup-section">
+          <h3 class="section-title">Backup</h3>
+          <div class="backup-row">
+            <button id="export-btn" class="btn btn-outline">Export JSON</button>
+            <button id="import-btn" class="btn btn-ghost">Import JSON</button>
+          </div>
+          <input type="file" id="import-file-input" accept=".json" class="hidden">
+        </div>
       </section>
 
     </main>
@@ -135,19 +106,12 @@
       <button class="nav-item" data-view="plan">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
-          <line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/>
+          <line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/>
+          <circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/>
         </svg>
         <span>Plan</span>
       </button>
     </nav>
-  </div>
-
-  <!-- User menu -->
-  <div id="user-menu-overlay" class="overlay hidden"></div>
-  <div id="user-menu" class="user-menu hidden">
-    <div id="user-email-display" class="user-email-display"></div>
-    <button id="sign-out-btn" class="user-menu-item">Sign out</button>
-    <button id="change-client-btn" class="user-menu-item">Change Client ID</button>
   </div>
 
   <!-- Session detail modal -->
@@ -162,21 +126,9 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
-
 </div>
 
-<script>
-  window._gsiCallbacks = [];
-  window.gsiReady = false;
-  function onGsiLoad() {
-    window.gsiReady = true;
-    window._gsiCallbacks.forEach(fn => fn());
-    window._gsiCallbacks = [];
-  }
-</script>
-<script src="https://accounts.google.com/gsi/client" onload="onGsiLoad()" async defer></script>
 <script src="app.js"></script>
 </body>
 </html>
