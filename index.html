@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f0f1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LiftLog">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>LiftLog</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Setup screen -->
+  <div id="screen-setup" class="screen hidden">
+    <div class="center-content">
+      <div class="app-logo">🏋️</div>
+      <h1>LiftLog</h1>
+      <p class="subtitle">Track your gains. Own your data.</p>
+      <div class="card setup-card">
+        <h2>Connect Google Drive</h2>
+        <p>Enter your Google OAuth Client ID. Your workout data will be stored in your own Drive.</p>
+        <label for="client-id-input">OAuth Client ID</label>
+        <input type="text" id="client-id-input" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+        <button id="save-setup-btn" class="btn btn-primary btn-block">Save &amp; Continue</button>
+        <p class="setup-help-text">See <strong>README.md</strong> for step-by-step setup instructions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth screen -->
+  <div id="screen-auth" class="screen hidden">
+    <div class="center-content">
+      <div class="app-logo">🏋️</div>
+      <h1>LiftLog</h1>
+      <p class="subtitle">Track your gains. Own your data.</p>
+      <button id="sign-in-btn" class="btn btn-primary btn-lg">Sign in with Google</button>
+      <p class="auth-note">Your data lives in your own Google Drive.</p>
+      <button id="change-client-id-btn" class="btn btn-ghost btn-sm">Change Client ID</button>
+    </div>
+  </div>
+
+  <!-- Main app -->
+  <div id="screen-main" class="screen hidden">
+    <header class="app-header">
+      <span class="app-header-title">LiftLog</span>
+      <div class="header-right">
+        <span id="sync-indicator" class="sync-indicator" title=""></span>
+        <button id="user-menu-btn" class="btn-icon" aria-label="Account">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="view-container" class="view-container">
+
+      <!-- TODAY -->
+      <section id="view-today" class="view active">
+        <div id="today-no-session">
+          <div class="view-header">
+            <h2>Start Workout</h2>
+            <span id="today-date" class="today-date"></span>
+          </div>
+          <div id="day-cards" class="day-cards"></div>
+        </div>
+        <div id="today-active-session" class="hidden">
+          <div class="session-header">
+            <div>
+              <h2 id="session-day-name"></h2>
+              <span id="session-timer" class="session-timer">0:00</span>
+            </div>
+            <button id="finish-workout-btn" class="btn btn-success">Finish</button>
+          </div>
+          <div id="session-exercises"></div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="view-history" class="view hidden">
+        <div class="view-header"><h2>History</h2></div>
+        <div id="history-list" class="history-list"></div>
+      </section>
+
+      <!-- BESTS / PROGRESS -->
+      <section id="view-bests" class="view hidden">
+        <div class="view-header">
+          <h2>Progress</h2>
+          <select id="bests-exercise-select" class="select"></select>
+        </div>
+        <div id="bests-selected-card" class="bests-selected-card"></div>
+        <div class="chart-section">
+          <h3 class="section-title">Estimated 1RM Over Time</h3>
+          <div id="progress-chart" class="chart-container"></div>
+        </div>
+        <h3 class="section-title" style="margin: 20px 16px 8px">All Personal Bests</h3>
+        <div id="bests-grid" class="bests-grid"></div>
+      </section>
+
+      <!-- PLAN -->
+      <section id="view-plan" class="view hidden">
+        <div class="view-header">
+          <h2>Workout Plan</h2>
+          <button id="add-day-btn" class="btn btn-outline btn-sm">+ Day</button>
+        </div>
+        <div id="plan-days" class="plan-days"></div>
+      </section>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-view="today">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M6 4v6m0 0c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V4M6 10H4m16 0h-2M9 4h6"/><rect x="3" y="16" width="4" height="5" rx="1"/><rect x="17" y="16" width="4" height="5" rx="1"/><line x1="7" y1="18" x2="17" y2="18"/>
+        </svg>
+        <span>Today</span>
+      </button>
+      <button class="nav-item" data-view="history">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>History</span>
+      </button>
+      <button class="nav-item" data-view="bests">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>Progress</span>
+      </button>
+      <button class="nav-item" data-view="plan">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/>
+        </svg>
+        <span>Plan</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- User menu -->
+  <div id="user-menu-overlay" class="overlay hidden"></div>
+  <div id="user-menu" class="user-menu hidden">
+    <div id="user-email-display" class="user-email-display"></div>
+    <button id="sign-out-btn" class="user-menu-item">Sign out</button>
+    <button id="change-client-btn" class="user-menu-item">Change Client ID</button>
+  </div>
+
+  <!-- Session detail modal -->
+  <div id="session-modal" class="modal hidden">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+        <button id="modal-close-btn" class="modal-close">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+</div>
+
+<script>
+  window._gsiCallbacks = [];
+  window.gsiReady = false;
+  function onGsiLoad() {
+    window.gsiReady = true;
+    window._gsiCallbacks.forEach(fn => fn());
+    window._gsiCallbacks = [];
+  }
+</script>
+<script src="https://accounts.google.com/gsi/client" onload="onGsiLoad()" async defer></script>
+<script src="app.js"></script>
+</body>
+</html>
