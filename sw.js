@@ -1,5 +1,5 @@
-const CACHE = 'liftlog-v1';
-const SHELL = ['/', '/index.html', '/app.js', '/styles.css', '/manifest.json'];
+const CACHE = 'liftlog-v2';
+const SHELL = ['./', './index.html', './app.js', './styles.css', './manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(

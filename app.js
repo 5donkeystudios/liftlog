@@ -156,6 +156,7 @@ function handleTokenResponse(resp) {
   }
   S.accessToken = resp.access_token;
   S.tokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
+  localStorage.setItem('liftlog_signed_in', '1');
   onAuthenticated();
 }
 
@@ -200,6 +201,7 @@ function signOut() {
   S.fileId = null;
   S.activeSession = null;
   clearInterval(S.timerInterval);
+  localStorage.removeItem('liftlog_signed_in');
   showScreen('auth');
   closeUserMenu();
 }
@@ -987,6 +989,20 @@ function wireEvents() {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
+async function tryAutoSignIn() {
+  return new Promise(resolve => {
+    const original = tokenClient.callback;
+    tokenClient.callback = (resp) => {
+      tokenClient.callback = original;
+      if (resp.error) { resolve(false); return; }
+      S.accessToken = resp.access_token;
+      S.tokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
+      resolve(true);
+    };
+    tokenClient.requestAccessToken({ prompt: '' });
+  });
+}
+
 async function init() {
   wireEvents();
 
@@ -998,6 +1014,22 @@ async function init() {
 
   S.clientId = storedId;
   await initTokenClient();
+
+  const wasSignedIn = localStorage.getItem('liftlog_signed_in');
+  if (wasSignedIn) {
+    showScreen('auth');
+    $('sign-in-btn').textContent = 'Signing in…';
+    $('sign-in-btn').disabled = true;
+    const ok = await tryAutoSignIn();
+    if (ok) {
+      localStorage.setItem('liftlog_signed_in', '1');
+      onAuthenticated();
+      return;
+    }
+    $('sign-in-btn').textContent = 'Sign in with Google';
+    $('sign-in-btn').disabled = false;
+  }
+
   showScreen('auth');
 }
 
